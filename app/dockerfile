@@ -1,0 +1,13 @@
+# syntax=docker/dockerfile:1
+FROM python:3
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /home/app/
+COPY . /home/app/
+RUN pip install -r requirements.txt
+RUN sed -i "s/ALLOWED_HOSTS = \[\]/ALLOWED_HOSTS = \['*'\]/" setup/settings.py
+RUN python /home/app/manage.py migrate
+RUN python /home/app/manage.py loaddata clientes.json
+ENTRYPOINT [ "python /home/app/manage.py runserver 0.0.0.0:8000 " ]
+EXPOSE 8000
